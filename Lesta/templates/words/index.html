@@ -1,0 +1,90 @@
+{% extends "words/base.html" %}
+{% block content %}
+
+    <h2>Страница для загрузки текстового файла</h2>
+    <p>{{message}}</p>
+
+    <div class="container-fluid text-center my-3 border">
+        <form method="POST" enctype="multipart/form-data" class="form-horizontal">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ my_form.as_p }}
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Отправить" class="btn btn-primary">
+                <button type="submit" name="deleteAll" class="btn btn-danger">Удалить все документы</button>
+            </div>
+        </form>
+    </div>
+
+    {% if docs %}
+    <div class="container-fluid text-center my-3">
+        <form method="GET" class="form-horizontal">
+            <div class="form-group">
+                <select name="docSelect" class="form-control" >
+                    {% for doc in docs %}
+                        <option value="{{ doc.id }}">
+                            {{ doc.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" name="fileSelect" value="fileSelect" class="btn btn-primary btn-sm">Показать таблицу для этого документа</button>
+                <button type="submit" name="deleteSelect" value="deleteSelect" class="btn btn-danger btn-sm">Удалить выбранный документ</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if words %}
+    <style>
+    .table td, .table th {
+        width: 33%;
+    }
+    </style>
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Слово</th>
+                <th>TF</th>
+                <th>IDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for word in words %}
+                <tr>
+                    <td>{{word.word}}</td>
+                    <td>{{word.count}}</td>
+                    <td>{{word.IDF}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if words.has_other_pages %}
+    <ul class="pagination">
+        {% if words.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ words.previous_page_number }}">Предыдущая</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Предыдущая</a></li>
+        {% endif %}
+
+        {% for i in words.paginator.page_range %}
+            {% if words.number == i %}
+                <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if words.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ words.next_page_number }}">Следующая</a></li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link">Следующая</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+{% endblock content %}
