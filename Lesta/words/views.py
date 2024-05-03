@@ -56,7 +56,7 @@ def index(request):
     if doc_id and docs:
         doc = Document.objects.get(id=doc_id)
         words_list = Tf.objects.filter(document=doc).annotate(IDF=Log(10, float(len(docs))/Count('word__document'))).order_by('-IDF')
-        paginator = Paginator(words_list, 10)
+        paginator = Paginator(words_list, 50)
         page_number = request.GET.get('page')
         words = paginator.get_page(page_number)
     return render(request, 'words/index.html', {'my_form': form, 'docs': docs, 'words': words})
